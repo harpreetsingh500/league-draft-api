@@ -5,6 +5,9 @@
   "scripts": {
     "start": "concurrently -c \"yellow.bold,green.bold\" -n \"SERVER,BUILD\" \"nodemon server\""
   },
+  "engines": {
+    "node": "12.19.x"
+  },
   "private": true,
   "dependencies": {
     "bcrypt": "^3.0.2",
