@@ -1,8 +1,6 @@
-const jwt = require('jsonwebtoken');
-const config = require('../config/config');
-const mongoose = require('mongoose');
 const Season = require('../models/season.model');
 const Team = require('../models/team.model');
+const GameResult = require('../models/game-result.model');
 const Joi = require('joi');
 
 module.exports = {
@@ -11,7 +9,8 @@ module.exports = {
   createSeason,
   createTeam,
   updateTeam,
-  getTeams
+  getTeams,
+  saveGameResult
 }
 
 const seasonSchema = Joi.object({
@@ -52,4 +51,8 @@ async function getTeams(seasonId) {
 
 async function getAllSeasons() {
   return await Season.find();
+}
+
+async function saveGameResult(game) {
+  return await new GameResult(game).save();
 }

@@ -16,6 +16,17 @@ router.post('/player', createPlayer);
 router.get('/:seasonId/player/:id', getPlayer);
 router.get('/:seasonId/players', getAllPlayers);
 
+router.post('/game-result', saveGameResults)
+
+function saveGameResults(req, res) {
+  let gameResult = {
+    name: "test",
+    result: JSON.stringify(req.body)
+  }
+  let savedGameResult = seasonCtrl.saveGameResult(gameResult);
+  res.json(savedGameResult);
+}
+
 function createPlayer(req, res) {
   let savedPlayer = playerCtrl.createPlayer(req.body);
   res.json(savedPlayer);
