@@ -48,9 +48,24 @@ async function getAllPlayers(req, res) {
   res.json({ players });
 }
 
-function createTeam(req, res) {
-  let team = seasonCtrl.createTeam(req.body);
-  res.json(team);
+async function createTeam(req, res) {
+  let team = await seasonCtrl.createTeam(req.body);
+  let teamPlayers = team.players;
+  let allPlayers = await playerCtrl.getAllPlayers(team.seasonId);
+
+  allPlayers = allPlayers.filter(x => x);
+  allPlayers.forEach(player => {
+    if (teamPlayers.includes(player.name)) {
+      player.teamId = team._id;
+    } else if (player.teamId === team._id) {
+      player.teamId = null;
+    }
+  });
+
+  return await Promise.all(allPlayers.map(async player => await playerCtrl.updatePlayer(player, team.seasonId))).then(() => {
+    allPlayers.forEach(x => x.teamName = team.name);
+    res.json({team});
+  });
 }
 
 async function updateTeam(req, res) {
@@ -93,6 +108,13 @@ async function getSeason(req, res) {
       player.teamName = team.name;
     }
   });
+
+  teams = teams.map(team => team.toObject());
+  teams.forEach(team => {
+    if (team && team.players && team.players.length) {
+      team.players = team.players.map(player => players.find(playerObj => playerObj.name === player)).filter(x => x);
+    }
+  })
 
   season = season.toObject();
   season.teams = teams;
