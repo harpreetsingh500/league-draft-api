@@ -56,19 +56,21 @@ function createTeam(req, res) {
 async function updateTeam(req, res) {
   let team = req.body;
   await seasonCtrl.updateTeam(req.body);
-  let players = team.players;
+  let teamPlayers = team.players;
+  let allPlayers = await playerCtrl.getAllPlayers(team.seasonId);
 
-  let savedPlayers = await Promise.all(players
-    .map(async player => {
-      return await playerCtrl.findPlayer(player, team.seasonId)
-    }));
+  allPlayers = allPlayers.filter(x => x);
+  allPlayers.forEach(player => {
+    if (teamPlayers.includes(player.name)) {
+      player.teamId = team._id;
+    } else if (player.teamId === team._id) {
+      player.teamId = null;
+    }
+  });
 
-  savedPlayers = savedPlayers.filter(x => x);
-  savedPlayers.forEach(player => player.teamId = team._id);
-
-  return await Promise.all(savedPlayers.map(async x => await playerCtrl.updatePlayer(x, team.seasonId))).then(() => {
-    savedPlayers.forEach(x => x.teamName = team.name);
-    res.json({team, savedPlayers});
+  return await Promise.all(allPlayers.map(async player => await playerCtrl.updatePlayer(player, team.seasonId))).then(() => {
+    allPlayers.forEach(x => x.teamName = team.name);
+    res.json({team, allPlayers});
   });
 }
 
