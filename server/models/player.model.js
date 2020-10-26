@@ -20,7 +20,16 @@ const PlayerSchema = new mongoose.Schema({
     type: String
   },
   notes: {
-    type: String,
+    type: String
+  },
+  soloRank: {
+    type: String
+  },
+  flexRank: {
+    type: String
+  },
+  riotAccountId: {
+    type: String
   },
   createdAt: {
     type: Date,

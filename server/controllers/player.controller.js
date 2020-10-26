@@ -13,7 +13,10 @@ const playerSchema = Joi.object({
   teamId: Joi.string(),
   primaryRole: Joi.string().required(),
   secondaryRole: Joi.string(),
-  notes: Joi.string()
+  notes: Joi.string(),
+  soloRank: Joi.string(),
+  flexRank: Joi.string(),
+  riotAccountId: Joi.string()
 })
 
 async function createPlayer(player) {

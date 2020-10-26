@@ -3,6 +3,8 @@ const seasonCtrl = require('../controllers/season.controller');
 const playerCtrl = require('../controllers/player.controller');
 
 const router = express.Router();
+const axios = require('axios')
+
 module.exports = router;
 
 router.post('/', createSeason);
@@ -15,6 +17,7 @@ router.put('/team', updateTeam);
 router.post('/player', createPlayer);
 router.get('/:seasonId/player/:id', getPlayer);
 router.get('/:seasonId/players', getAllPlayers);
+router.get('/:seasonId/players/update-ranked-info/:apiKey', updateAllPlayersRankedInfo)
 
 router.post('/game-result', saveGameResults)
 
@@ -46,6 +49,48 @@ async function getAllPlayers(req, res) {
   let noTeam = req.query.noTeam === 'true';
   let players = await playerCtrl.getAllPlayers(req.params.seasonId, noTeam);
   res.json({ players });
+}
+
+async function updateAllPlayersRankedInfo(req, res) {
+  let seasonId = req.params.seasonId;
+  let riotApiKey = req.params.apiKey;
+
+  let allPlayers = await playerCtrl.getAllPlayers(seasonId);
+  let playersRankedInfo = [];
+
+  allPlayers = allPlayers.filter(x => x);
+  allPlayers = allPlayers.map(player => player.toObject()).filter(x => x);
+
+  let delay = 0;
+  const delayIncrement = 1000;
+
+  const promises = allPlayers.map(player => {
+    delay += delayIncrement;
+    return new Promise(resolve => setTimeout(resolve, delay)).then(() =>
+        getRankedInfo(player, riotApiKey));
+  });
+
+  playersRankedInfo = await Promise.all(promises);
+  playersRankedInfo = playersRankedInfo.map(accountInfo => accountInfo && accountInfo.data).filter(x => x);
+
+  allPlayers.forEach(player => {
+    playersRankedInfo.find(rankedData => {
+      if (rankedData && rankedData.length) {
+        const soloRank = rankedData.find(x => x.queueType === 'RANKED_SOLO_5x5');
+        const flexRank = rankedData.find(x => x.queueType === 'RANKED_FLEX_SR');
+        const summonerName = soloRank ? soloRank.summonerName : (flexRank ? flexRank.summonerName : "");
+
+        if ((soloRank || flexRank) && summonerName.toLowerCase() === player.name.toLowerCase()) {
+          player.soloRank = soloRank ? soloRank.tier + " " + soloRank.rank : null;
+          player.flexRank = flexRank ? flexRank.tier + " " + flexRank.rank : null;
+        }
+      }
+    });
+  });
+
+  return await Promise.all(allPlayers.map(async player => await playerCtrl.updatePlayer(player, seasonId))).then(() => {
+    res.json({allPlayers});
+  });
 }
 
 async function createTeam(req, res) {
@@ -126,4 +171,24 @@ async function getSeason(req, res) {
 async function getAllSeasons(req, res) {
   let seasons = await seasonCtrl.getAllSeasons();
   res.json({ seasons });
+}
+
+const getRankedInfo = async (player, apiKey) => {
+  try {
+    let accountInfo;
+
+    if (!player.riotAccountId) {
+      let accountInfoApiUrl = `https://na1.api.riotgames.com/lol/summoner/v4/summoners/by-name/${player.name}?api_key=${apiKey}`;
+      let encodedUri = encodeURI(accountInfoApiUrl);
+
+      accountInfo = await axios.get(encodedUri);
+      player.riotAccountId = accountInfo && accountInfo.data ? accountInfo.data.id : '';
+    }
+
+    let rankedInfoApiUrl = `https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/${player.riotAccountId}?api_key=${apiKey}`;
+
+    return await axios.get(rankedInfoApiUrl)
+  } catch (error) {
+    console.error(error)
+  }
 }
