@@ -14,6 +14,9 @@ router.get('/', getAllSeasons);
 router.post('/team', createTeam);
 router.put('/team', updateTeam);
 
+router.post('/match', createMatch);
+router.put('/match/:matchId', updateMatch);
+
 router.post('/player', createPlayer);
 router.get('/:seasonId/player/:id', getPlayer);
 router.get('/:seasonId/players', getAllPlayers);
@@ -134,15 +137,30 @@ async function updateTeam(req, res) {
   });
 }
 
+async function createMatch(req, res) {
+  let match = await seasonCtrl.createMatch(req.body);
+
+  res.json(match);
+}
+
+async function updateMatch(req, res) {
+  let matchId = req.params.matchId;
+  let match = await seasonCtrl.updateMatch(req.body, matchId);
+
+  res.json(match);
+}
+
 function createSeason(req, res) {
   let seasons = seasonCtrl.createSeason(req.body);
   res.json({ seasons });
 }
 
 async function getSeason(req, res) {
-  let season = await seasonCtrl.getSeason(req.params.id);
-  let teams = await seasonCtrl.getTeams(req.params.id);
-  let players = await playerCtrl.getAllPlayers(req.params.id);
+  let seasonId = req.params.id;
+  let season = await seasonCtrl.getSeason(seasonId);
+  let teams = await seasonCtrl.getTeams(seasonId);
+  let players = await playerCtrl.getAllPlayers(seasonId);
+  let matches = await seasonCtrl.getAllMatches(seasonId);
 
   players = players.map(player => player.toObject());
 
@@ -159,11 +177,12 @@ async function getSeason(req, res) {
     if (team && team.players && team.players.length) {
       team.players = team.players.map(player => players.find(playerObj => playerObj.name === player)).filter(x => x);
     }
-  })
+  });
 
   season = season.toObject();
   season.teams = teams;
   season.players = players;
+  season.matches = matches;
 
   res.json(season);
 }
