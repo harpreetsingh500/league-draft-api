@@ -170,7 +170,13 @@ async function getSeason(req, res) {
   let players = await playerCtrl.getAllPlayers(seasonId);
   let matches = await seasonCtrl.getAllMatches(seasonId);
 
-  matches = matches.map(match => match.toObject());
+  matches = matches.map(match => match.toObject()).sort((match1, match2) => {
+    const match1Date = new Date(`${match1.matchDate} ${match1.matchTime} ${match1.timeZone}`);
+    const match2Date = new Date(`${match2.matchDate} ${match2.matchTime} ${match2.timeZone}`)
+
+    return match1Date - match2Date;
+  });
+
   players = players.map(player => player.toObject());
 
   players.forEach(player => {
