@@ -14,6 +14,7 @@ module.exports = {
   saveGameResult,
   createMatch,
   updateMatch,
+  deleteMatch,
   getAllMatches
 }
 
@@ -37,8 +38,9 @@ const matchSchema = Joi.object({
   teamTwoProtectedBan: Joi.string().required(),
   matchDate: Joi.string().required(),
   matchTime: Joi.string().required(),
-  matchLink: Joi.string(),
-  winningTeamId: Joi.string()
+  timeZone: Joi.string().required(),
+  matchLink: Joi.empty(),
+  winningTeamId: Joi.empty()
 });
 
 async function createSeason(season) {
@@ -67,6 +69,10 @@ async function updateMatch(match, seasonId) {
   match = await Joi.validate(match, matchSchema, { abortEarly: false });
 
   return Match.updateOne({_id: seasonId}, match);
+}
+
+async function deleteMatch(match, seasonId) {
+  return Match.deleteOne({_id: seasonId}, match);
 }
 
 async function getAllMatches(seasonId) {

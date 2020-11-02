@@ -16,6 +16,7 @@ router.put('/team', updateTeam);
 
 router.post('/match', createMatch);
 router.put('/match/:matchId', updateMatch);
+router.delete('/match/:matchId', deleteMatch);
 
 router.post('/player', createPlayer);
 router.get('/:seasonId/player/:id', getPlayer);
@@ -150,6 +151,13 @@ async function updateMatch(req, res) {
   res.json(match);
 }
 
+async function deleteMatch(req, res) {
+  let matchId = req.params.matchId;
+  let match = await seasonCtrl.deleteMatch(req.body, matchId);
+
+  res.json(match);
+}
+
 function createSeason(req, res) {
   let seasons = seasonCtrl.createSeason(req.body);
   res.json({ seasons });
@@ -162,6 +170,7 @@ async function getSeason(req, res) {
   let players = await playerCtrl.getAllPlayers(seasonId);
   let matches = await seasonCtrl.getAllMatches(seasonId);
 
+  matches = matches.map(match => match.toObject());
   players = players.map(player => player.toObject());
 
   players.forEach(player => {
@@ -176,6 +185,12 @@ async function getSeason(req, res) {
   teams.forEach(team => {
     if (team && team.players && team.players.length) {
       team.players = team.players.map(player => players.find(playerObj => playerObj.name === player)).filter(x => x);
+
+      const wonMatches = matches.filter(match => match.winningTeamId == team._id);
+      const lostMatches = matches.filter(match => (match.teamOneId == team._id || match.teamTwoId == team._id) && match.winningTeamId && match.winningTeamId != team._id);
+
+      team.wins = wonMatches.length;
+      team.losses = lostMatches.length;
     }
   });
 

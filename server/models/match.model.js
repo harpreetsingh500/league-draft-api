@@ -29,6 +29,10 @@ const MatchSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  timeZone: {
+    type: String,
+    required: true
+  },
   matchLink: {
     type: String
   },
