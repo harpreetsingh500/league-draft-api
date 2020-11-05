@@ -40,7 +40,9 @@ const matchSchema = Joi.object({
   matchTime: Joi.string().required(),
   timeZone: Joi.string().required(),
   matchLink: Joi.empty(),
-  winningTeamId: Joi.empty()
+  winningTeamId: Joi.empty(),
+  vodLink: Joi.empty(),
+  wasShoutCasted: Joi.empty(),
 });
 
 async function createSeason(season) {

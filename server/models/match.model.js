@@ -39,6 +39,12 @@ const MatchSchema = new mongoose.Schema({
   winningTeamId: {
     type: String,
   },
+  vodLink: {
+    type: String
+  },
+  wasShoutCasted: {
+    type: Boolean
+  },
   createdAt: {
     type: Date,
     default: Date.now
