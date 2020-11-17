@@ -2,6 +2,7 @@ const Season = require('../models/season.model');
 const Team = require('../models/team.model');
 const Match = require('../models/match.model');
 const GameResult = require('../models/game-result.model');
+const Game = require('../models/game.model');
 const Joi = require('joi');
 
 module.exports = {
@@ -15,7 +16,8 @@ module.exports = {
   createMatch,
   updateMatch,
   deleteMatch,
-  getAllMatches
+  getAllMatches,
+  getAllGames
 }
 
 const seasonSchema = Joi.object({
@@ -95,4 +97,8 @@ async function getAllSeasons() {
 
 async function saveGameResult(game) {
   return await new GameResult(game).save();
+}
+
+async function getAllGames(seasonId) {
+  return await Game.find({seasonId: seasonId});
 }
