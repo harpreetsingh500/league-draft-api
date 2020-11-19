@@ -46,6 +46,10 @@ async function getSeasonStats(req, res) {
     let playersWithHighestCSPerMin;
     let playersWithHighestVisionScore;
     let playersWithMostPinkWardsPlaced;
+    let playersWithMostDamageTaken;
+    let playersWithMostHealing;
+    let playersWithLargestCriticalStrike;
+    let playersWithMostTimeCCingOthers;
 
     allGamesData = allGamesData.map(game => {
       if (game && game.participants && game.participants.length && game.participantIdentities && game.participantIdentities.length) {
@@ -69,7 +73,11 @@ async function getSeasonStats(req, res) {
             totalMinionsKilled: participant.stats.totalMinionsKilled + participant.stats.neutralMinionsKilled,
             csPerMin: ((participant.stats.totalMinionsKilled + participant.stats.neutralMinionsKilled) / gameTime).toFixed(1),
             visionScore: participant.stats.visionScore,
-            pinkWardsPlaced: participant.stats.visionWardsBoughtInGame
+            pinkWardsPlaced: participant.stats.visionWardsBoughtInGame,
+            damageTaken: participant.stats.totalDamageTaken,
+            healing: participant.stats.totalHeal,
+            criticalStrike: participant.stats.largestCriticalStrike,
+            timeCCingOthers: participant.stats.timeCCingOthers
           };
         });
       }
@@ -87,6 +95,10 @@ async function getSeasonStats(req, res) {
     playersWithHighestCSPerMin = allGamesData.sort((a, b) => b.csPerMin - a.csPerMin).slice(0, 5);
     playersWithHighestVisionScore = allGamesData.sort((a, b) => b.visionScore - a.visionScore).slice(0, 5);
     playersWithMostPinkWardsPlaced = allGamesData.sort((a, b) => b.pinkWardsPlaced - a.pinkWardsPlaced).slice(0, 5);
+    playersWithMostDamageTaken = allGamesData.sort((a, b) => b.damageTaken - a.damageTaken).slice(0, 5);
+    playersWithMostHealing = allGamesData.sort((a, b) => b.healing - a.healing).slice(0, 5);
+    playersWithLargestCriticalStrike = allGamesData.sort((a, b) => b.criticalStrike - a.criticalStrike).slice(0, 5);
+    playersWithMostTimeCCingOthers = allGamesData.sort((a, b) => b.timeCCingOthers - a.timeCCingOthers).slice(0, 5);
 
     stats.push({
       title: "Highest KDA  ",
@@ -219,8 +231,52 @@ async function getSeasonStats(req, res) {
         };
       }),
     });
-  }
 
+    stats.push({
+      title: "Most Damage Taken",
+      data: playersWithMostDamageTaken.map(x => {
+        return {
+          score: x.damageTaken,
+          playerName: x.participantName,
+          championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+        };
+      }),
+    });
+
+    stats.push({
+      title: "Most Healing",
+      data: playersWithMostHealing.map(x => {
+        return {
+          score: x.healing,
+          playerName: x.participantName,
+          championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+        };
+      }),
+    });
+
+    stats.push({
+      title: "Largest Critical Strike",
+      data: playersWithLargestCriticalStrike.map(x => {
+        return {
+          score: x.criticalStrike,
+          playerName: x.participantName,
+          championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+        };
+      }),
+    });
+
+    stats.push({
+      title: "Time CCing Others(seconds)",
+      data: playersWithMostTimeCCingOthers.map(x => {
+        return {
+          score: x.timeCCingOthers,
+          playerName: x.participantName,
+          championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+        };
+      }),
+    });
+  }
+  
   res.json(stats);
 }
 
