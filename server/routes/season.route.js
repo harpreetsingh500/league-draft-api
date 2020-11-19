@@ -34,18 +34,18 @@ async function getSeasonStats(req, res) {
   let stats = [];
 
   if (allGamesData && allGamesData.length) {
-    let playerWithHighestKda;
-    let playerWithMostKills;
-    let playerWithMostAssists;
-    let playerWithMostDamage;
-    let playerWithMostDamagePerMin;
-    let playerWithMostGoldEarned;
-    let playerWithMostGoldPerMin;
-    let playerWithLargestKillingSpree;
-    let playerWithMostCS;
-    let playerWithHighestCSPerMin;
-    let playerWithHighestVisionScore;
-    let playerWithMostPinkWardsPlaced;
+    let playersWithHighestKda;
+    let playersWithMostKills;
+    let playersWithMostAssists;
+    let playersWithMostDamage;
+    let playersWithMostDamagePerMin;
+    let playersWithMostGoldEarned;
+    let playersWithMostGoldPerMin;
+    let playersWithLargestKillingSpree;
+    let playersWithMostCS;
+    let playersWithHighestCSPerMin;
+    let playersWithHighestVisionScore;
+    let playersWithMostPinkWardsPlaced;
 
     allGamesData = allGamesData.map(game => {
       if (game && game.participants && game.participants.length && game.participantIdentities && game.participantIdentities.length) {
@@ -62,12 +62,12 @@ async function getSeasonStats(req, res) {
             assists: participant.stats.assists,
             deaths: participant.stats.deaths,
             championDamage: participant.stats.totalDamageDealtToChampions,
-            championDamagePerMin: participant.stats.totalDamageDealtToChampions / gameTime,
+            championDamagePerMin: (participant.stats.totalDamageDealtToChampions / gameTime).toFixed(1),
             goldEarned: participant.stats.goldEarned,
-            goldEarnedPerMin: participant.stats.goldEarned / gameTime,
+            goldEarnedPerMin: (participant.stats.goldEarned / gameTime).toFixed(1),
             largestKillingSpree: participant.stats.largestKillingSpree,
             totalMinionsKilled: participant.stats.totalMinionsKilled + participant.stats.neutralMinionsKilled,
-            csPerMin: (participant.stats.totalMinionsKilled + participant.stats.neutralMinionsKilled) / gameTime,
+            csPerMin: ((participant.stats.totalMinionsKilled + participant.stats.neutralMinionsKilled) / gameTime).toFixed(1),
             visionScore: participant.stats.visionScore,
             pinkWardsPlaced: participant.stats.visionWardsBoughtInGame
           };
@@ -75,101 +75,149 @@ async function getSeasonStats(req, res) {
       }
     }).flat();
 
-    playerWithHighestKda = allGamesData.sort((a, b) => b.kda - a.kda)[0];
-    playerWithMostKills = allGamesData.sort((a, b) => b.kills - a.kills)[0];
-    playerWithMostAssists = allGamesData.sort((a, b) => b.assists - a.assists)[0];
-    playerWithMostDamage = allGamesData.sort((a, b) => b.championDamage - a.championDamage)[0];
-    playerWithMostDamagePerMin = allGamesData.sort((a, b) => b.championDamagePerMin - a.championDamagePerMin)[0];
-    playerWithMostGoldEarned = allGamesData.sort((a, b) => b.goldEarned - a.goldEarned)[0];
-    playerWithMostGoldPerMin = allGamesData.sort((a, b) => b.goldEarnedPerMin - a.goldEarnedPerMin)[0];
-    playerWithLargestKillingSpree = allGamesData.sort((a, b) => b.largestKillingSpree - a.largestKillingSpree)[0];
-    playerWithMostCS = allGamesData.sort((a, b) => b.totalMinionsKilled - a.totalMinionsKilled)[0];
-    playerWithHighestCSPerMin = allGamesData.sort((a, b) => b.csPerMin - a.csPerMin)[0];
-    playerWithHighestVisionScore = allGamesData.sort((a, b) => b.visionScore - a.visionScore)[0];
-    playerWithMostPinkWardsPlaced = allGamesData.sort((a, b) => b.pinkWardsPlaced - a.pinkWardsPlaced)[0];
+    playersWithHighestKda = allGamesData.sort((a, b) => b.kda - a.kda).slice(0, 5);
+    playersWithMostKills = allGamesData.sort((a, b) => b.kills - a.kills).slice(0, 5);
+    playersWithMostAssists = allGamesData.sort((a, b) => b.assists - a.assists).slice(0, 5);
+    playersWithMostDamage = allGamesData.sort((a, b) => b.championDamage - a.championDamage).slice(0, 5);
+    playersWithMostDamagePerMin = allGamesData.sort((a, b) => b.championDamagePerMin - a.championDamagePerMin).slice(0, 5);
+    playersWithMostGoldEarned = allGamesData.sort((a, b) => b.goldEarned - a.goldEarned).slice(0, 5);
+    playersWithMostGoldPerMin = allGamesData.sort((a, b) => b.goldEarnedPerMin - a.goldEarnedPerMin).slice(0, 5);
+    playersWithLargestKillingSpree = allGamesData.sort((a, b) => b.largestKillingSpree - a.largestKillingSpree).slice(0, 5);
+    playersWithMostCS = allGamesData.sort((a, b) => b.totalMinionsKilled - a.totalMinionsKilled).slice(0, 5);
+    playersWithHighestCSPerMin = allGamesData.sort((a, b) => b.csPerMin - a.csPerMin).slice(0, 5);
+    playersWithHighestVisionScore = allGamesData.sort((a, b) => b.visionScore - a.visionScore).slice(0, 5);
+    playersWithMostPinkWardsPlaced = allGamesData.sort((a, b) => b.pinkWardsPlaced - a.pinkWardsPlaced).slice(0, 5);
 
     stats.push({
-      title: "Highest KDA",
-      score: playerWithHighestKda.kda,
-      playerName: playerWithHighestKda.participantName,
-      championName: await getChampionNameByKey(playerWithHighestKda.championId, "en_US")
+      title: "Highest KDA  ",
+      data: playersWithHighestKda.map(x => {
+        return {
+          score: x.kda,
+          playerName: x.participantName,
+          championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+        };
+      }),
     });
 
     stats.push({
       title: "Most Kills",
-      score: playerWithMostKills.kills,
-      playerName: playerWithMostKills.participantName,
-      championName: await getChampionNameByKey(playerWithMostKills.championId, "en_US")
+      data: playersWithMostKills.map(x => {
+        return {
+          score: x.kills,
+          playerName: x.participantName,
+          championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+        };
+      }),
     });
 
     stats.push({
       title: "Most Assists",
-      score: playerWithMostAssists.assists,
-      playerName: playerWithMostAssists.participantName,
-      championName: await getChampionNameByKey(playerWithMostAssists.championId, "en_US")
+      data: playersWithMostAssists.map(x => {
+        return {
+          score: x.assists,
+          playerName: x.participantName,
+          championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+        };
+      }),
     });
 
     stats.push({
       title: "Most Damage",
-      score: playerWithMostDamage.championDamage,
-      playerName: playerWithMostDamage.participantName,
-      championName: await getChampionNameByKey(playerWithMostDamage.championId, "en_US")
+      data: playersWithMostDamage.map(x => {
+        return {
+          score: x.championDamage,
+          playerName: x.participantName,
+          championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+        };
+      }),
     });
 
     stats.push({
       title: "Most Damage Per Min",
-      score: playerWithMostDamagePerMin.championDamagePerMin.toFixed(1),
-      playerName: playerWithMostDamagePerMin.participantName,
-      championName: await getChampionNameByKey(playerWithMostDamagePerMin.championId, "en_US")
+      data: playersWithMostDamagePerMin.map(x => {
+        return {
+          score: x.championDamagePerMin,
+          playerName: x.participantName,
+          championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+        };
+      }),
     });
 
     stats.push({
       title: "Most Gold",
-      score: playerWithMostGoldEarned.goldEarned,
-      playerName: playerWithMostGoldEarned.participantName,
-      championName: await getChampionNameByKey(playerWithMostGoldEarned.championId, "en_US")
+      data: playersWithMostGoldEarned.map(x => {
+        return {
+          score: x.goldEarned,
+          playerName: x.participantName,
+          championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+        };
+      }),
     });
 
     stats.push({
       title: "Most Gold Per Min",
-      score: playerWithMostGoldPerMin.goldEarnedPerMin.toFixed(1),
-      playerName: playerWithMostGoldPerMin.participantName,
-      championName: await getChampionNameByKey(playerWithMostGoldPerMin.championId, "en_US")
+      data: playersWithMostGoldPerMin.map(x => {
+        return {
+          score: x.goldEarnedPerMin,
+          playerName: x.participantName,
+          championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+        };
+      }),
     });
 
     stats.push({
       title: "Largest Killing Spree",
-      score: playerWithLargestKillingSpree.largestKillingSpree,
-      playerName: playerWithLargestKillingSpree.participantName,
-      championName: await getChampionNameByKey(playerWithLargestKillingSpree.championId, "en_US")
+      data: playersWithLargestKillingSpree.map(x => {
+        return {
+          score: x.largestKillingSpree,
+          playerName: x.participantName,
+          championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+        };
+      }),
     });
 
     stats.push({
       title: "Most CS",
-      score: playerWithMostCS.totalMinionsKilled,
-      playerName: playerWithMostCS.participantName,
-      championName: await getChampionNameByKey(playerWithMostCS.championId, "en_US")
+      data: playersWithMostCS.map(x => {
+        return {
+          score: x.totalMinionsKilled,
+          playerName: x.participantName,
+          championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+        };
+      }),
     });
 
     stats.push({
       title: "Most CS Per Min",
-      score: playerWithHighestCSPerMin.csPerMin.toFixed(1),
-      playerName: playerWithHighestCSPerMin.participantName,
-      championName: await getChampionNameByKey(playerWithHighestCSPerMin.championId, "en_US")
+      data: playersWithHighestCSPerMin.map(x => {
+        return {
+          score: x.csPerMin,
+          playerName: x.participantName,
+          championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+        };
+      }),
     });
 
     stats.push({
       title: "Highest Vision Score",
-      score: playerWithHighestVisionScore.visionScore,
-      playerName: playerWithHighestVisionScore.participantName,
-      championName: await getChampionNameByKey(playerWithHighestVisionScore.championId, "en_US")
+      data: playersWithHighestVisionScore.map(x => {
+        return {
+          score: x.visionScore,
+          playerName: x.participantName,
+          championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+        };
+      }),
     });
 
     stats.push({
       title: "Most Pink Wards Bought",
-      score: playerWithMostPinkWardsPlaced.pinkWardsPlaced,
-      playerName: playerWithMostPinkWardsPlaced.participantName,
-      championName: await getChampionNameByKey(playerWithMostPinkWardsPlaced.championId, "en_US")
+      data: playersWithMostPinkWardsPlaced.map(x => {
+        return {
+          score: x.pinkWardsPlaced,
+          playerName: x.participantName,
+          championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+        };
+      }),
     });
   }
 
@@ -394,26 +442,24 @@ async function getLatestChampionDDragon(language = "en_US") {
   const version = (await axios.get("http://ddragon.leagueoflegends.com/api/versions.json")).data[0];
   const response = await axios.get(`https://ddragon.leagueoflegends.com/cdn/${version}/data/${language}/champion.json`);
 
-  championJson[language] = response.data;
-  return championJson[language];
+  const json = response.data;
+  championJson[language] = json
+
+  // Setup cache
+  championByIdCache[language] = {};
+  for (var championName in json.data) {
+    if (!json.data.hasOwnProperty(championName))
+      continue;
+
+    const champInfo = json.data[championName];
+    championByIdCache[language][champInfo.key] = champInfo;
+  }
 }
 
-async function getChampionNameByKey(key, language = "en_US") {
-  // Setup cache
-  if (!championByIdCache[language]) {
-    let json = await getLatestChampionDDragon(language);
-
-    championByIdCache[language] = {};
-    for (var championName in json.data) {
-      if (!json.data.hasOwnProperty(championName))
-        continue;
-
-      const champInfo = json.data[championName];
-      championByIdCache[language][champInfo.key] = champInfo;
-    }
+function getChampionNameByKey(key, language = "en_US") {
+  if (championByIdCache[language] && championByIdCache[language][key]) {
+   return championByIdCache[language][key]['id'];
   }
-
-  return championByIdCache[language][key]['id'];
 }
 
 async function getChampionData() {
