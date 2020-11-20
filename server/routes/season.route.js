@@ -488,7 +488,7 @@ async function getMatch(req, res) {
   });
 
   teamOneStats.push({
-    title: "Highest KDA",
+    title: "KDA",
     data: teamOneGameData.map(x => {
       return {
         score: x.kda,
@@ -499,7 +499,7 @@ async function getMatch(req, res) {
   });
   
   teamOneStats.push({
-    title: "Most Damage",
+    title: "Damage",
     data: teamOneGameData.map(x => {
       return {
         score: x.championDamage,
@@ -510,7 +510,7 @@ async function getMatch(req, res) {
   });
 
   teamOneStats.push({
-    title: "Most Healing",
+    title: "Healing",
     data: teamOneGameData.map(x => {
       return {
         score: x.healing,
@@ -521,7 +521,7 @@ async function getMatch(req, res) {
   });
 
   teamOneStats.push({
-    title: "Most Gold",
+    title: "Gold",
     data: teamOneGameData.map(x => {
       return {
         score: x.goldEarned,
@@ -532,7 +532,7 @@ async function getMatch(req, res) {
   });
 
   teamOneStats.push({
-    title: "Most CS",
+    title: "CS",
     data: teamOneGameData.map(x => {
       return {
         score: x.totalMinionsKilled,
@@ -543,7 +543,7 @@ async function getMatch(req, res) {
   });
 
   teamOneStats.push({
-    title: "Most CS Per Min",
+    title: "CS Per Min",
     data: teamOneGameData.map(x => {
       return {
         score: x.csPerMin,
@@ -554,7 +554,7 @@ async function getMatch(req, res) {
   });
 
   teamOneStats.push({
-    title: "Highest Vision Score",
+    title: "Vision Score",
     data: teamOneGameData.map(x => {
       return {
         score: x.visionScore,
@@ -565,7 +565,7 @@ async function getMatch(req, res) {
   });
 
   teamOneStats.push({
-    title: "Most Pink Wards Bought",
+    title: "Pink Wards Bought",
     data: teamOneGameData.map(x => {
       return {
         score: x.pinkWardsPlaced,
@@ -576,7 +576,7 @@ async function getMatch(req, res) {
   });
 
   teamTwoStats.push({
-    title: "Highest KDA",
+    title: "KDA",
     data: teamTwoGameData.map(x => {
       return {
         score: x.kda,
@@ -587,7 +587,7 @@ async function getMatch(req, res) {
   });
 
   teamTwoStats.push({
-    title: "Most Damage",
+    title: "Damage",
     data: teamTwoGameData.map(x => {
       return {
         score: x.championDamage,
@@ -598,7 +598,7 @@ async function getMatch(req, res) {
   });
 
   teamTwoStats.push({
-    title: "Most Healing",
+    title: "Healing",
     data: teamTwoGameData.map(x => {
       return {
         score: x.healing,
@@ -609,7 +609,7 @@ async function getMatch(req, res) {
   });
 
   teamTwoStats.push({
-    title: "Most Gold",
+    title: "Gold",
     data: teamTwoGameData.map(x => {
       return {
         score: x.goldEarned,
@@ -620,7 +620,7 @@ async function getMatch(req, res) {
   });
 
   teamTwoStats.push({
-    title: "Most CS",
+    title: "CS",
     data: teamTwoGameData.map(x => {
       return {
         score: x.totalMinionsKilled,
@@ -631,7 +631,7 @@ async function getMatch(req, res) {
   });
 
   teamTwoStats.push({
-    title: "Most CS Per Min",
+    title: "CS Per Min",
     data: teamTwoGameData.map(x => {
       return {
         score: x.csPerMin,
@@ -642,7 +642,7 @@ async function getMatch(req, res) {
   });
 
   teamTwoStats.push({
-    title: "Highest Vision Score",
+    title: "Vision Score",
     data: teamTwoGameData.map(x => {
       return {
         score: x.visionScore,
@@ -653,7 +653,7 @@ async function getMatch(req, res) {
   });
 
   teamTwoStats.push({
-    title: "Most Pink Wards Bought",
+    title: "Pink Wards Bought",
     data: teamTwoGameData.map(x => {
       return {
         score: x.pinkWardsPlaced,
