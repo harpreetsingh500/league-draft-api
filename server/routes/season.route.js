@@ -14,6 +14,7 @@ router.get('/', getAllSeasons);
 router.post('/team', createTeam);
 router.put('/team', updateTeam);
 
+router.get('/match/:gameId', getMatch);
 router.post('/match', createMatch);
 router.put('/match/:matchId', updateMatch);
 router.delete('/match/:matchId', deleteMatch);
@@ -59,9 +60,10 @@ async function getSeasonStats(req, res) {
           const participantInfo = game.participantIdentities.find(x => x.participantId === participant.participantId);
 
           return {
+            gameId: game.gameId,
             participantName: participantInfo && participantInfo.player ? participantInfo.player.summonerName : '',
             championId: participant.championId,
-            kda: (participant.stats.kills + participant.stats.assists) / (participant.stats.deaths === 0 ? 1 : participant.stats.deaths),
+            kda: ((participant.stats.kills + participant.stats.assists) / (participant.stats.deaths === 0 ? 1 : participant.stats.deaths)).toFixed(1),
             kills: participant.stats.kills,
             assists: participant.stats.assists,
             deaths: participant.stats.deaths,
@@ -104,6 +106,7 @@ async function getSeasonStats(req, res) {
       title: "Highest KDA  ",
       data: playersWithHighestKda.map(x => {
         return {
+          gameId: x.gameId,
           score: x.kda,
           playerName: x.participantName,
           championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
@@ -115,6 +118,7 @@ async function getSeasonStats(req, res) {
       title: "Most Kills",
       data: playersWithMostKills.map(x => {
         return {
+          gameId: x.gameId,
           score: x.kills,
           playerName: x.participantName,
           championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
@@ -126,6 +130,7 @@ async function getSeasonStats(req, res) {
       title: "Most Assists",
       data: playersWithMostAssists.map(x => {
         return {
+          gameId: x.gameId,
           score: x.assists,
           playerName: x.participantName,
           championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
@@ -137,6 +142,7 @@ async function getSeasonStats(req, res) {
       title: "Most Damage",
       data: playersWithMostDamage.map(x => {
         return {
+          gameId: x.gameId,
           score: x.championDamage,
           playerName: x.participantName,
           championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
@@ -148,6 +154,7 @@ async function getSeasonStats(req, res) {
       title: "Most Damage Per Min",
       data: playersWithMostDamagePerMin.map(x => {
         return {
+          gameId: x.gameId,
           score: x.championDamagePerMin,
           playerName: x.participantName,
           championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
@@ -159,6 +166,7 @@ async function getSeasonStats(req, res) {
       title: "Most Gold",
       data: playersWithMostGoldEarned.map(x => {
         return {
+          gameId: x.gameId,
           score: x.goldEarned,
           playerName: x.participantName,
           championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
@@ -170,6 +178,7 @@ async function getSeasonStats(req, res) {
       title: "Most Gold Per Min",
       data: playersWithMostGoldPerMin.map(x => {
         return {
+          gameId: x.gameId,
           score: x.goldEarnedPerMin,
           playerName: x.participantName,
           championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
@@ -181,6 +190,7 @@ async function getSeasonStats(req, res) {
       title: "Largest Killing Spree",
       data: playersWithLargestKillingSpree.map(x => {
         return {
+          gameId: x.gameId,
           score: x.largestKillingSpree,
           playerName: x.participantName,
           championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
@@ -192,6 +202,7 @@ async function getSeasonStats(req, res) {
       title: "Most CS",
       data: playersWithMostCS.map(x => {
         return {
+          gameId: x.gameId,
           score: x.totalMinionsKilled,
           playerName: x.participantName,
           championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
@@ -203,6 +214,7 @@ async function getSeasonStats(req, res) {
       title: "Most CS Per Min",
       data: playersWithHighestCSPerMin.map(x => {
         return {
+          gameId: x.gameId,
           score: x.csPerMin,
           playerName: x.participantName,
           championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
@@ -214,6 +226,7 @@ async function getSeasonStats(req, res) {
       title: "Highest Vision Score",
       data: playersWithHighestVisionScore.map(x => {
         return {
+          gameId: x.gameId,
           score: x.visionScore,
           playerName: x.participantName,
           championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
@@ -225,6 +238,7 @@ async function getSeasonStats(req, res) {
       title: "Most Pink Wards Bought",
       data: playersWithMostPinkWardsPlaced.map(x => {
         return {
+          gameId: x.gameId,
           score: x.pinkWardsPlaced,
           playerName: x.participantName,
           championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
@@ -236,6 +250,7 @@ async function getSeasonStats(req, res) {
       title: "Most Damage Taken",
       data: playersWithMostDamageTaken.map(x => {
         return {
+          gameId: x.gameId,
           score: x.damageTaken,
           playerName: x.participantName,
           championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
@@ -247,6 +262,7 @@ async function getSeasonStats(req, res) {
       title: "Most Healing",
       data: playersWithMostHealing.map(x => {
         return {
+          gameId: x.gameId,
           score: x.healing,
           playerName: x.participantName,
           championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
@@ -258,6 +274,7 @@ async function getSeasonStats(req, res) {
       title: "Largest Critical Strike",
       data: playersWithLargestCriticalStrike.map(x => {
         return {
+          gameId: x.gameId,
           score: x.criticalStrike,
           playerName: x.participantName,
           championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
@@ -269,6 +286,7 @@ async function getSeasonStats(req, res) {
       title: "Time CCing Others(seconds)",
       data: playersWithMostTimeCCingOthers.map(x => {
         return {
+          gameId: x.gameId,
           score: x.timeCCingOthers,
           playerName: x.participantName,
           championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
@@ -391,6 +409,266 @@ async function updateTeam(req, res) {
     allPlayers.forEach(x => x.teamName = team.name);
     res.json({team, allPlayers});
   });
+}
+
+async function getMatch(req, res) {
+  let gameId = req.params.gameId;
+  let match = await seasonCtrl.getMatch(gameId);
+
+  if (!match) {
+    res.status(404).send('Match Not found');
+  }
+
+  match = match.toObject();
+  let teamOne = await seasonCtrl.getTeam(match.teamOneId);
+  let teamTwo = await seasonCtrl.getTeam(match.teamTwoId);
+  let game = await seasonCtrl.getGame(match.gameId);
+
+  if (!game) {
+    res.status(404).send('Game Not found');
+  }
+
+  let gameData = JSON.parse(game.data);
+  let teamOneStats = [];
+  let teamTwoStats = [];
+  let teamOneGameData;
+  let teamTwoGameData;
+  const gameTime = gameData.gameDuration / 60;
+
+  teamOneGameData = gameData.participants.slice(0, 5).map(participant => {
+    const participantInfo = gameData.participantIdentities.find(x => x.participantId === participant.participantId);
+
+    return {
+      participantName: participantInfo && participantInfo.player ? participantInfo.player.summonerName : '',
+      championId: participant.championId,
+      kda: ((participant.stats.kills + participant.stats.assists) / (participant.stats.deaths === 0 ? 1 : participant.stats.deaths)).toFixed(1),
+      kills: participant.stats.kills,
+      assists: participant.stats.assists,
+      deaths: participant.stats.deaths,
+      championDamage: participant.stats.totalDamageDealtToChampions,
+      championDamagePerMin: (participant.stats.totalDamageDealtToChampions / gameTime).toFixed(1),
+      goldEarned: participant.stats.goldEarned,
+      goldEarnedPerMin: (participant.stats.goldEarned / gameTime).toFixed(1),
+      largestKillingSpree: participant.stats.largestKillingSpree,
+      totalMinionsKilled: participant.stats.totalMinionsKilled + participant.stats.neutralMinionsKilled,
+      csPerMin: ((participant.stats.totalMinionsKilled + participant.stats.neutralMinionsKilled) / gameTime).toFixed(1),
+      visionScore: participant.stats.visionScore,
+      pinkWardsPlaced: participant.stats.visionWardsBoughtInGame,
+      damageTaken: participant.stats.totalDamageTaken,
+      healing: participant.stats.totalHeal,
+      criticalStrike: participant.stats.largestCriticalStrike,
+      timeCCingOthers: participant.stats.timeCCingOthers
+    };
+  });
+
+  teamTwoGameData = gameData.participants.slice(5, 10).map(participant => {
+    const participantInfo = gameData.participantIdentities.find(x => x.participantId === participant.participantId);
+
+    return {
+      participantName: participantInfo && participantInfo.player ? participantInfo.player.summonerName : '',
+      championId: participant.championId,
+      kda: ((participant.stats.kills + participant.stats.assists) / (participant.stats.deaths === 0 ? 1 : participant.stats.deaths)).toFixed(1),
+      kills: participant.stats.kills,
+      assists: participant.stats.assists,
+      deaths: participant.stats.deaths,
+      championDamage: participant.stats.totalDamageDealtToChampions,
+      championDamagePerMin: (participant.stats.totalDamageDealtToChampions / gameTime).toFixed(1),
+      goldEarned: participant.stats.goldEarned,
+      goldEarnedPerMin: (participant.stats.goldEarned / gameTime).toFixed(1),
+      largestKillingSpree: participant.stats.largestKillingSpree,
+      totalMinionsKilled: participant.stats.totalMinionsKilled + participant.stats.neutralMinionsKilled,
+      csPerMin: ((participant.stats.totalMinionsKilled + participant.stats.neutralMinionsKilled) / gameTime).toFixed(1),
+      visionScore: participant.stats.visionScore,
+      pinkWardsPlaced: participant.stats.visionWardsBoughtInGame,
+      damageTaken: participant.stats.totalDamageTaken,
+      healing: participant.stats.totalHeal,
+      criticalStrike: participant.stats.largestCriticalStrike,
+      timeCCingOthers: participant.stats.timeCCingOthers
+    };
+  });
+
+  teamOneStats.push({
+    title: "Highest KDA",
+    data: teamOneGameData.map(x => {
+      return {
+        score: x.kda,
+        playerName: x.participantName,
+        championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+      };
+    }).sort((a, b) => b.score - a.score),
+  });
+  
+  teamOneStats.push({
+    title: "Most Damage",
+    data: teamOneGameData.map(x => {
+      return {
+        score: x.championDamage,
+        playerName: x.participantName,
+        championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+      };
+    }).sort((a, b) => b.score - a.score),
+  });
+
+  teamOneStats.push({
+    title: "Most Healing",
+    data: teamOneGameData.map(x => {
+      return {
+        score: x.healing,
+        playerName: x.participantName,
+        championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+      };
+    }).sort((a, b) => b.score - a.score),
+  });
+
+  teamOneStats.push({
+    title: "Most Gold",
+    data: teamOneGameData.map(x => {
+      return {
+        score: x.goldEarned,
+        playerName: x.participantName,
+        championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+      };
+    }).sort((a, b) => b.score - a.score),
+  });
+
+  teamOneStats.push({
+    title: "Most CS",
+    data: teamOneGameData.map(x => {
+      return {
+        score: x.totalMinionsKilled,
+        playerName: x.participantName,
+        championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+      };
+    }).sort((a, b) => b.score - a.score),
+  });
+
+  teamOneStats.push({
+    title: "Most CS Per Min",
+    data: teamOneGameData.map(x => {
+      return {
+        score: x.csPerMin,
+        playerName: x.participantName,
+        championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+      };
+    }).sort((a, b) => b.score - a.score),
+  });
+
+  teamOneStats.push({
+    title: "Highest Vision Score",
+    data: teamOneGameData.map(x => {
+      return {
+        score: x.visionScore,
+        playerName: x.participantName,
+        championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+      };
+    }).sort((a, b) => b.score - a.score),
+  });
+
+  teamOneStats.push({
+    title: "Most Pink Wards Bought",
+    data: teamOneGameData.map(x => {
+      return {
+        score: x.pinkWardsPlaced,
+        playerName: x.participantName,
+        championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+      };
+    }).sort((a, b) => b.score - a.score),
+  });
+
+  teamTwoStats.push({
+    title: "Highest KDA",
+    data: teamTwoGameData.map(x => {
+      return {
+        score: x.kda,
+        playerName: x.participantName,
+        championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+      };
+    }).sort((a, b) => b.score - a.score),
+  });
+
+  teamTwoStats.push({
+    title: "Most Damage",
+    data: teamTwoGameData.map(x => {
+      return {
+        score: x.championDamage,
+        playerName: x.participantName,
+        championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+      };
+    }).sort((a, b) => b.score - a.score),
+  });
+
+  teamTwoStats.push({
+    title: "Most Healing",
+    data: teamTwoGameData.map(x => {
+      return {
+        score: x.healing,
+        playerName: x.participantName,
+        championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+      };
+    }).sort((a, b) => b.score - a.score),
+  });
+
+  teamTwoStats.push({
+    title: "Most Gold",
+    data: teamTwoGameData.map(x => {
+      return {
+        score: x.goldEarned,
+        playerName: x.participantName,
+        championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+      };
+    }).sort((a, b) => b.score - a.score),
+  });
+
+  teamTwoStats.push({
+    title: "Most CS",
+    data: teamTwoGameData.map(x => {
+      return {
+        score: x.totalMinionsKilled,
+        playerName: x.participantName,
+        championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+      };
+    }).sort((a, b) => b.score - a.score),
+  });
+
+  teamTwoStats.push({
+    title: "Most CS Per Min",
+    data: teamTwoGameData.map(x => {
+      return {
+        score: x.csPerMin,
+        playerName: x.participantName,
+        championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+      };
+    }).sort((a, b) => b.score - a.score),
+  });
+
+  teamTwoStats.push({
+    title: "Highest Vision Score",
+    data: teamTwoGameData.map(x => {
+      return {
+        score: x.visionScore,
+        playerName: x.participantName,
+        championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+      };
+    }).sort((a, b) => b.score - a.score),
+  });
+
+  teamTwoStats.push({
+    title: "Most Pink Wards Bought",
+    data: teamTwoGameData.map(x => {
+      return {
+        score: x.pinkWardsPlaced,
+        playerName: x.participantName,
+        championName: x.championId ? getChampionNameByKey(x.championId, "en_US") : null,
+      };
+    }).sort((a, b) => b.score - a.score),
+  });
+
+  match.teamOneName = teamOne.toObject().name;
+  match.teamTwoName = teamTwo.toObject().name;
+  match.teameOneStats = teamOneStats;
+  match.teamTwoStats = teamTwoStats;
+
+  res.json(match)
 }
 
 async function createMatch(req, res) {

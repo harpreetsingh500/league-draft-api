@@ -9,15 +9,18 @@ module.exports = {
   getAllSeasons,
   getSeason,
   createSeason,
+  getTeam,
   createTeam,
   updateTeam,
   getTeams,
   saveGameResult,
+  getMatch,
   createMatch,
   updateMatch,
   deleteMatch,
   getAllMatches,
-  getAllGames
+  getAllGames,
+  getGame
 }
 
 const seasonSchema = Joi.object({
@@ -53,6 +56,10 @@ async function createSeason(season) {
   return await new Season(season).save();
 }
 
+async function getTeam(id) {
+  return await Team.findById(id);
+}
+
 async function createTeam(team) {
   team = await Joi.validate(team, teamSchema, { abortEarly: false });
 
@@ -61,6 +68,10 @@ async function createTeam(team) {
 
 async function updateTeam(team) {
   return await Team.updateOne({_id: team._id}, team);
+}
+
+async function getMatch(gameId) {
+  return await Match.findOne({gameId: gameId});
 }
 
 async function createMatch(match) {
@@ -97,6 +108,10 @@ async function getAllSeasons() {
 
 async function saveGameResult(game) {
   return await new GameResult(game).save();
+}
+
+async function getGame(gameId) {
+  return await Game.findOne({gameId: gameId});
 }
 
 async function getAllGames(seasonId) {
