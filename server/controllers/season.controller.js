@@ -80,14 +80,14 @@ async function createMatch(match) {
   return await new Match(match).save();
 }
 
-async function updateMatch(match, seasonId) {
+async function updateMatch(match, matchId) {
   match = await Joi.validate(match, matchSchema, { abortEarly: false });
 
-  return Match.updateOne({_id: seasonId}, match);
+  return Match.updateOne({_id: matchId}, match);
 }
 
-async function deleteMatch(match, seasonId) {
-  return Match.deleteOne({_id: seasonId}, match);
+async function deleteMatch(match, matchId) {
+  return Match.deleteOne({_id: matchId}, match);
 }
 
 async function getAllMatches(seasonId) {
