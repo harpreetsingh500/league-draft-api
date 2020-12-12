@@ -205,7 +205,7 @@ async function getDDragonVersion() {
   const today = new Date();
 
   if (!cachedDDragonVersion || today > cachedDDragonVersionDate) {
-    cachedDDragonVersion = (await axios.get("http://ddragon.leagueoflegends.com/api/versions.json")).data[0];
+    cachedDDragonVersion = (await axios.get("https://ddragon.leagueoflegends.com/api/versions.json")).data[0];
     cachedDDragonVersionDate = new Date();
     cachedDDragonVersionDate.setDate(cachedDDragonVersionDate.getDate() + 14);
   }

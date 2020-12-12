@@ -773,7 +773,7 @@ async function getLatestChampionDDragon(language = "en_US") {
   if (championJson[language])
     return championJson[language];
 
-  const version = (await axios.get("http://ddragon.leagueoflegends.com/api/versions.json")).data[0];
+  const version = (await axios.get("https://ddragon.leagueoflegends.com/api/versions.json")).data[0];
   const response = await axios.get(`https://ddragon.leagueoflegends.com/cdn/${version}/data/${language}/champion.json`);
 
   const json = response.data;
