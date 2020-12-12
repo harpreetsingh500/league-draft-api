@@ -175,16 +175,18 @@ async function getTeamCompsForUser(req, res) {
 
 let championJson = {};
 let language = "en_US";
+let cachedDDragonVersion;
+let cachedDDragonVersionDate;
 
 async function getLatestChampionDDragon() {
   if (championJson[language])
     return championJson[language];
 
-  const version = (await axios.get("http://ddragon.leagueoflegends.com/api/versions.json")).data[0];
-  const response = await axios.get(`https://ddragon.leagueoflegends.com/cdn/${version}/data/${language}/champion.json`);
+    const version = await getDDragonVersion();
+    const response = await axios.get(`https://ddragon.leagueoflegends.com/cdn/${version}/data/${language}/champion.json`);
 
-  const json = response.data;
-  championJson[language] = json
+    const json = response.data;
+    championJson[language] = json
 }
 
 function getChampionInfoByKey(name) {
@@ -194,9 +196,21 @@ function getChampionInfoByKey(name) {
 }
 
 async function getLatestDDragonVersion(req, res) {
-  const version = (await axios.get("http://ddragon.leagueoflegends.com/api/versions.json")).data[0];
+  const version = await getDDragonVersion();
 
    res.json({ version })
+}
+
+async function getDDragonVersion() {
+  const today = new Date();
+
+  if (!cachedDDragonVersion || today > cachedDDragonVersionDate) {
+    cachedDDragonVersion = (await axios.get("http://ddragon.leagueoflegends.com/api/versions.json")).data[0];
+    cachedDDragonVersionDate = new Date();
+    cachedDDragonVersionDate.setDate(cachedDDragonVersionDate.getDate() + 14);
+  }
+
+  return cachedDDragonVersion;
 }
 
 async function getChampionNames(req, res) {
