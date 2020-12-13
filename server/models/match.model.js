@@ -45,6 +45,12 @@ const MatchSchema = new mongoose.Schema({
   wasShoutCasted: {
     type: Boolean
   },
+  tournamentCode: {
+    type: String
+  },
+  gameId: {
+    type: String
+  },
   createdAt: {
     type: Date,
     default: Date.now

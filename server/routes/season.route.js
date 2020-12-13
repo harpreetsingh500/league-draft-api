@@ -27,6 +27,7 @@ router.get('/:seasonId/players/update-ranked-info/:apiKey', updateAllPlayersRank
 router.get('/:id/stats', getSeasonStats);
 
 router.post('/game-result', saveGameResults)
+router.get('/get-and-save-tournament-codes/:seasonId', getAndSaveTournamentCodes)
 
 async function getSeasonStats(req, res) {
   let seasonId = req.params.id;
@@ -298,12 +299,48 @@ async function getSeasonStats(req, res) {
   res.json(stats);
 }
 
-function saveGameResults(req, res) {
-  let gameResult = {
-    name: "test",
-    result: JSON.stringify(req.body)
+async function saveGameResults(req, res) {
+  let savedGameResult;
+
+  if (req.body) {
+    let tournamentCode = req.body.shortCode;
+    let gameId = req.body.gameId;
+    let gameResult = {
+      tournamentCode,
+      gameId,
+      result: JSON.stringify(req.body)
+    }
+
+    savedGameResult = await seasonCtrl.saveGameResult(gameResult);
+    gameData = (await getGameData(tournamentCode, gameId)).data;
+    tournamentCodeObj = (await seasonCtrl.getTournamentCode(tournamentCode)).toObject();
+
+    let gameInfo = {
+      gameId: gameId,
+      seasonId: tournamentCodeObj.seasonId,
+      data: JSON.stringify(gameData)
+    }
+
+    await seasonCtrl.saveGame(gameInfo);
+    let match = (await seasonCtrl.getMatchByTournamentCode(tournamentCode)).toObject();
+
+    if (match && gameData) {
+      let winningTeam = gameData.teams.find(team => team.win.toLowerCase() === 'win');
+      let winningTeamId;
+
+      if (winningTeam.teamId === 100) {
+        winningTeamId = match.teamOneId;
+      } else {
+        winningTeamId = match.teamTwoId;
+      }
+
+      match.winningTeamId = winningTeamId;
+      match.gameId = gameId;
+
+      await seasonCtrl.updateMatch(match, match._id);
+    }
   }
-  let savedGameResult = seasonCtrl.saveGameResult(gameResult);
+
   res.json(savedGameResult);
 }
 
@@ -672,7 +709,19 @@ async function getMatch(req, res) {
 }
 
 async function createMatch(req, res) {
-  let match = await seasonCtrl.createMatch(req.body);
+  let match = (await seasonCtrl.createMatch(req.body)).toObject();
+
+  if (match) {
+    let tournamentCodeObj = (await seasonCtrl.getAvailableTournamentCode(match.seasonId)).toObject();
+
+    if (tournamentCodeObj) {
+      tournamentCodeObj.matchId = match._id;
+      match.tournamentCode = tournamentCodeObj.tournamentCode;
+
+      await seasonCtrl.updateTournamentCode(tournamentCodeObj._id, tournamentCodeObj);
+      await seasonCtrl.updateMatch(match, match._id);
+    }
+  }
 
   res.json(match);
 }
@@ -746,6 +795,26 @@ async function getAllSeasons(req, res) {
   res.json({ seasons });
 }
 
+async function getAndSaveTournamentCodes(req, res) {
+  // get tournament codes here
+  let seasonId = req.params.seasonId;
+
+  if (seasonId && tournamentCodes && tournamentCodes.length) {
+    tournamentCodes = tournamentCodes.map(tournamentCode => {
+      return {
+        seasonId,
+        tournamentCode,
+      }
+    });
+  
+    return await Promise.all(tournamentCodes.map(async tournamentCode => await seasonCtrl.saveTournamentCode(tournamentCode))).then((result) => {
+      res.json({result});
+    });
+  } else {
+    res.json({});
+  }
+}
+
 const getRankedInfo = async (player, apiKey) => {
   try {
     let accountInfo;
@@ -761,6 +830,17 @@ const getRankedInfo = async (player, apiKey) => {
     let rankedInfoApiUrl = `https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/${player.riotAccountId}?api_key=${apiKey}`;
 
     return await axios.get(rankedInfoApiUrl)
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+const getGameData = async (tournamentCode, gameId) => {
+  try {
+    let gameDataApiUrl = `https://na1.api.riotgames.com/lol/match/v4/matches/${gameId}/by-tournament-code/${tournamentCode}?api_key=${riotApiKey}`;
+    let encodedUri = encodeURI(gameDataApiUrl);
+
+    return await axios.get(encodedUri);
   } catch (error) {
     console.error(error)
   }
@@ -801,3 +881,8 @@ async function getChampionData() {
 }
 
 getChampionData();
+
+let riotApiKey = 'RGAPI-5663a1ea-1caa-497a-a98b-eaefa8cb614f';
+let riotTournamentProviderId = '12298';
+let riotTournamentId = '1870940';
+let tournamentCodes = [];

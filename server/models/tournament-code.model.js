@@ -1,17 +1,16 @@
 const mongoose = require('mongoose');
 
-const GameResultSchema = new mongoose.Schema({
+const TournamentCodeSchema = new mongoose.Schema({
+    seasonId: {
+        type: String,
+        required: true
+    },
     tournamentCode: {
         type: String,
         required: true
     },
-    gameId: {
+    matchId: {
         type: String,
-        required: true
-    },
-    result: {
-        type: String,
-        required: true
     },
     createdAt: {
         type: Date,
@@ -21,4 +20,4 @@ const GameResultSchema = new mongoose.Schema({
     versionKey: false
 });
 
-module.exports = mongoose.model('GameResult', GameResultSchema);
+module.exports = mongoose.model('TournamentCode', TournamentCodeSchema);

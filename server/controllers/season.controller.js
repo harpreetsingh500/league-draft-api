@@ -3,6 +3,7 @@ const Team = require('../models/team.model');
 const Match = require('../models/match.model');
 const GameResult = require('../models/game-result.model');
 const Game = require('../models/game.model');
+const TournamentCode = require('../models/tournament-code.model');
 const Joi = require('joi');
 
 module.exports = {
@@ -15,12 +16,18 @@ module.exports = {
   getTeams,
   saveGameResult,
   getMatch,
+  getMatchByTournamentCode,
   createMatch,
   updateMatch,
   deleteMatch,
   getAllMatches,
   getAllGames,
-  getGame
+  getGame,
+  saveGame,
+  saveTournamentCode,
+  getAvailableTournamentCode,
+  updateTournamentCode,
+  getTournamentCode
 }
 
 const seasonSchema = Joi.object({
@@ -36,6 +43,7 @@ const teamSchema = Joi.object({
 });
 
 const matchSchema = Joi.object({
+  _id: Joi.empty(),
   seasonId: Joi.string().required(),
   teamOneId: Joi.string().required(),
   teamTwoId: Joi.string().required(),
@@ -48,6 +56,9 @@ const matchSchema = Joi.object({
   winningTeamId: Joi.empty(),
   vodLink: Joi.empty(),
   wasShoutCasted: Joi.empty(),
+  tournamentCode: Joi.empty(),
+  gameId: Joi.empty(),
+  createdAt: Joi.empty()
 });
 
 async function createSeason(season) {
@@ -72,6 +83,10 @@ async function updateTeam(team) {
 
 async function getMatch(gameId) {
   return await Match.findOne({gameId: gameId});
+}
+
+async function getMatchByTournamentCode(tournamentCode) {
+  return await Match.findOne({tournamentCode: tournamentCode});
 }
 
 async function createMatch(match) {
@@ -110,10 +125,30 @@ async function saveGameResult(game) {
   return await new GameResult(game).save();
 }
 
+async function saveGame(game) {
+  return await new Game(game).save();
+}
+
 async function getGame(gameId) {
   return await Game.findOne({gameId: gameId});
 }
 
 async function getAllGames(seasonId) {
   return await Game.find({seasonId: seasonId});
+}
+
+async function saveTournamentCode(tournamentCode) {
+  return await new TournamentCode(tournamentCode).save();
+}
+
+async function getTournamentCode(tournamentCode) {
+  return await TournamentCode.findOne({tournamentCode: tournamentCode});
+}
+
+async function getAvailableTournamentCode(seasonId) {
+  return await TournamentCode.findOne({seasonId: seasonId, matchId: null});
+}
+
+async function updateTournamentCode(id, tournamentCode) {
+  return TournamentCode.updateOne({_id: id}, tournamentCode);
 }
