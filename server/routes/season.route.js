@@ -311,33 +311,37 @@ async function saveGameResults(req, res) {
       result: JSON.stringify(req.body)
     }
 
-    savedGameResult = await seasonCtrl.saveGameResult(gameResult);
-    gameData = (await getGameData(tournamentCode, gameId)).data;
-    tournamentCodeObj = (await seasonCtrl.getTournamentCode(tournamentCode)).toObject();
+    let existingGameResult = await seasonCtrl.getGameResultByGameId(gameId);
 
-    let gameInfo = {
-      gameId: gameId,
-      seasonId: tournamentCodeObj.seasonId,
-      data: JSON.stringify(gameData)
-    }
-
-    await seasonCtrl.saveGame(gameInfo);
-    let match = (await seasonCtrl.getMatchByTournamentCode(tournamentCode)).toObject();
-
-    if (match && gameData) {
-      let winningTeam = gameData.teams.find(team => team.win.toLowerCase() === 'win');
-      let winningTeamId;
-
-      if (winningTeam.teamId === 100) {
-        winningTeamId = match.teamOneId;
-      } else {
-        winningTeamId = match.teamTwoId;
+    if (!existingGameResult) {
+      savedGameResult = await seasonCtrl.saveGameResult(gameResult);
+      gameData = (await getGameData(tournamentCode, gameId)).data;
+      tournamentCodeObj = (await seasonCtrl.getTournamentCode(tournamentCode)).toObject();
+  
+      let gameInfo = {
+        gameId: gameId,
+        seasonId: tournamentCodeObj.seasonId,
+        data: JSON.stringify(gameData)
       }
-
-      match.winningTeamId = winningTeamId;
-      match.gameId = gameId;
-
-      await seasonCtrl.updateMatch(match, match._id);
+  
+      await seasonCtrl.saveGame(gameInfo);
+      let match = (await seasonCtrl.getMatchByTournamentCode(tournamentCode)).toObject();
+  
+      if (match && gameData) {
+        let winningTeam = gameData.teams.find(team => team.win.toLowerCase() === 'win');
+        let winningTeamId;
+  
+        if (winningTeam.teamId === 100) {
+          winningTeamId = match.teamOneId;
+        } else {
+          winningTeamId = match.teamTwoId;
+        }
+  
+        match.winningTeamId = winningTeamId;
+        match.gameId = gameId;
+  
+        await seasonCtrl.updateMatch(match, match._id);
+      }
     }
   }
 

@@ -14,6 +14,7 @@ module.exports = {
   createTeam,
   updateTeam,
   getTeams,
+  getGameResultByGameId,
   saveGameResult,
   getMatch,
   getMatchByTournamentCode,
@@ -119,6 +120,10 @@ async function getTeams(seasonId) {
 
 async function getAllSeasons() {
   return await Season.find();
+}
+
+async function getGameResultByGameId(gameId) {
+  return await GameResult.findOne({gameId: gameId});
 }
 
 async function saveGameResult(game) {
