@@ -992,7 +992,7 @@ function isHEHeroPriceLow(heroes, heroName, heroPrice) {
           .sort();
     const priceAverage = firstFive.reduce((a, b) => a + b) / firstFive.length;
 
-    return heroPrice < priceAverage;
+    return heroPrice <= priceAverage;
   }
 }
 
