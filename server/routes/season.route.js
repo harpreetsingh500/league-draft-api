@@ -983,6 +983,19 @@ async function getChampionData() {
   await getLatestChampionDDragon();
 }
 
+function isHEHeroPriceLow(heroes, heroName, heroPrice) {
+  if (heroes && heroes.length && heroName && heroPrice) {
+    const allHeroPrices = heroes.filter(hero => hero.name === heroName && hero.sale)
+          .map(hero => hero.sale.price)
+    const firstFive =  allHeroPrices
+          .slice(0, 5)
+          .sort();
+    const priceAverage = firstFive.reduce((a, b) => a + b) / 5;
+    
+    return heroPrice < priceAverage;
+  }
+}
+
 async function getHEListings() {
   const allHeroes = [];
   const championArray = [];
@@ -1000,7 +1013,7 @@ async function getHEListings() {
     if(champ.sale) {
       let saleStartTime = new Date(champ.sale.startTime);
       let currentTime = new Date(new Date() - 600000);
-      if(saleStartTime > currentTime) {
+      if(saleStartTime > currentTime && isHEHeroPriceLow(allHeroes, champ.name, champ.sale.price)) {
           championArray.push({
               champName: champ.name,
               champPrice: champ.sale.price,
@@ -1018,7 +1031,7 @@ async function getHEListings() {
     let res = await axios.get(championArray[newChampNum].champAddress);
     let curChamp = res.data;
     championArray[newChampNum].champRarity = curChamp.Tier;
-    console.log(discordPosting)
+    console.log(championArray[newChampNum].isPriceLow)
     discordPosting.push(championArray[newChampNum].champRarity.toUpperCase() + ' ' + championArray[newChampNum].champName + ' is on sale for ' + championArray[newChampNum].champPrice + '. Buy at: ' + championArray[newChampNum].champBuy);
 };
 
