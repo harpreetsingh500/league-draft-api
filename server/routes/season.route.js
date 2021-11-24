@@ -20,6 +20,7 @@ router.put('/match/:matchId', updateMatch);
 router.delete('/match/:matchId', deleteMatch);
 
 router.post('/player', createPlayer);
+router.post('/:seasonId/players', createPlayers);
 router.get('/:seasonId/player/:id', getPlayer);
 router.get('/:seasonId/players', getAllPlayers);
 router.get('/:seasonId/players/update-ranked-info/:apiKey', updateAllPlayersRankedInfo)
@@ -27,7 +28,7 @@ router.get('/:seasonId/players/update-ranked-info/:apiKey', updateAllPlayersRank
 router.get('/:id/stats', getSeasonStats);
 
 router.post('/game-result', saveGameResults)
-router.get('/get-and-save-tournament-codes/:seasonId', getAndSaveTournamentCodes)
+router.post('/get-and-save-tournament-codes/:seasonId', getAndSaveTournamentCodes)
 
 async function getSeasonStats(req, res) {
   let seasonId = req.params.id;
@@ -353,6 +354,16 @@ function createPlayer(req, res) {
   res.json(savedPlayer);
 }
 
+async function createPlayers(req, res) {
+  const players = req.body.players;
+
+  players.forEach(player => player.seasonId = req.params.seasonId);
+
+  return await Promise.all(players.map(async player => await playerCtrl.createPlayer(player))).then(() => {
+    res.json({players});
+  });
+}
+
 async function getPlayer(req, res) {
   let player = await playerCtrl.findPlayer(req.params.id);
   res.json(player);
@@ -452,7 +463,94 @@ async function updateTeam(req, res) {
   });
 }
 
+function getNftValue(nft) {
+  var rareBackgrounds = ['Stitches', 'Bones', 'Bunnybot', 'Burgerbun', 'Headless', 'Cactus', 'Gamebun', 'Alien', 'Balloon', 'Blocky', 'Popular rodent', 'Icecream', 'Gold', 'Laser', 'Rainbow'];
+  var rareBody = ['Stitches', 'Bones', 'Bunnybot', 'Burgerbun', 'Headless', 'Cactus', 'Gamebun', 'Alien', 'Balloon', 'Blocky', 'Popular rodent', 'Icecream', 'Gold', 'Cracked', 'Ice', 'Magma', 'Pinata', 'Acid', 'Wood', 'Robot', 'Zombie', 'Water'];
+  var rareClothes = ['Stitches', 'Bones', 'Bunnybot', 'Burgerbun', 'Headless', 'Cactus', 'Gamebun', 'Alien', 'Balloon', 'Blocky', 'Popular rodent', 'Icecream', 'Coins', 'Kimono', 'Royal', 'Tux gold', 'Robot', 'Wizard', 'Pinata', 'Surgeon', 'Fancy jacket', 'Bat', 'Magic hat', 'Box', 'Jumpsuit'];
+  var rareEyes = ['Stitches', 'Bones', 'Bunnybot', 'Burgerbun', 'Headless', 'Cactus', 'Gamebun', 'Alien', 'Balloon', 'Blocky', 'Popular rodent', 'Icecream', 'Laser', 'Robot', 'Censored', 'Monocle', 'Spiral glasses', '3d', 'Eyepatch', 'Surgeon', 'Fancy jacket', 'Bat', 'Magic hat', 'Box', 'Jumpsuit'];
+  var rareMouth = ['Stitches', 'Bones', 'Bunnybot', 'Burgerbun', 'Headless', 'Cactus', 'Gamebun', 'Alien', 'Balloon', 'Blocky', 'Popular rodent', 'Icecream', 'Gas mask', 'Rose', 'Bubble pipe', 'Juice box'];
+  var rareEar = ['Stitches', 'Bones', 'Bunnybot', 'Burgerbun', 'Headless', 'Cactus', 'Gamebun', 'Alien', 'Balloon', 'Blocky', 'Popular rodent', 'Icecream', 'Diamond ring', 'Sparkles', 'Music', 'Question', 'Flies', 'Plane', 'Belt', 'Tag'];
+  var rareHat = ['Stitches', 'Bones', 'Bunnybot', 'Burgerbun', 'Headless', 'Cactus', 'Gamebun', 'Alien', 'Balloon', 'Blocky', 'Popular rodent', 'Icecream', 'Crown', 'Deer antlers', 'Astronaut', 'Halo', 'Tinfoil', 'Laurel', 'Snail', 'Wizard', 'Top hat', 'Pirate', 'Goggles', 'Ninja', 'Playbunny'];
+  var isRareBackground = false;
+  var isRareBunny = false;
+  var isRareClothes = false;
+  var isRareEyes = false;
+  var isRareMouth = false;
+  var isRareEar = false;
+  var isRareHat = false;
+  var value = 0;
+
+  if (nft) {
+    nft.attributes.forEach(nft => {
+      switch (nft.traitType) {
+        case "background": 
+          isRareBackground = rareBackgrounds.includes(nft.value);
+          value += nftMarketData.background[nft.value];
+          break;
+        case "bunny": 
+          isRareBunny = rareBody.includes(nft.value);
+          value += nftMarketData.bunny[nft.value];
+          break;
+        case "clothes": 
+          isRareClothes = rareClothes.includes(nft.value);
+          value += nftMarketData.clothes[nft.value];
+          break;
+        case "eyes": 
+          isRareEyes = rareEyes.includes(nft.value);
+          value += nftMarketData.eyes[nft.value];
+          break;
+        case "mouth": 
+          isRareMouth = rareMouth.includes(nft.value);
+          value += nftMarketData.mouth[nft.value];
+          break;
+        case "ear": 
+          isRareEar = rareEar.includes(nft.value);
+          value += nftMarketData.ear[nft.value];
+          break;
+        case "hat": 
+          isRareHat = rareHat.includes(nft.value);
+          value += nftMarketData.hat[nft.value];
+          break;
+      }
+    });
+  }
+console.log(value)
+  return value;
+}
+
+async function getRarestNfts() {
+  var allNftApiCalls = [];
+  var rareNftIds = [];
+
+  let delay = 0;
+  const delayIncrement = 10;
+
+  for (var x = 9000; x <= 9500; x++) {
+    let accountInfoApiUrl = `https://nft.pancakeswap.com/api/v1/collections/0x0a8901b0E25DEb55A87524f0cC164E9644020EBA/tokens/${x}`;
+    let encodedUri = encodeURI(accountInfoApiUrl);
+    delay += delayIncrement;
+    allNftApiCalls.push(new Promise(resolve => setTimeout(resolve, delay))
+    .then(() => axios.get(encodedUri))
+    .catch(function(err) {
+      console.log(err.message); // some coding error in handling happened
+    }));
+  }
+
+  return Promise.all(allNftApiCalls).then(function(values) {
+    const allNftData = values.map(x => x && x.data && x.data.data ? x.data.data : null)
+      .filter(x => x)
+      .filter(nft => getNftValue(nft) < 2500)
+      .map(nft => nft.tokenId);
+
+    console.log(allNftData);
+  }).catch(function(err) {
+    console.log(err.message); // some coding error in handling happened
+  });
+}
+
 async function getMatch(req, res) {
+  await getRarestNfts();
+
   let gameId = req.params.gameId;
   let match = await seasonCtrl.getMatch(gameId);
 
@@ -802,7 +900,8 @@ async function getAllSeasons(req, res) {
 async function getAndSaveTournamentCodes(req, res) {
   // get tournament codes here
   let seasonId = req.params.seasonId;
-
+  let tournamentCodes = req.body.tournamentCodes;
+  
   if (seasonId && tournamentCodes && tournamentCodes.length) {
     tournamentCodes = tournamentCodes.map(tournamentCode => {
       return {
@@ -884,9 +983,79 @@ async function getChampionData() {
   await getLatestChampionDDragon();
 }
 
+async function getHEListings() {
+  const allHeroes = [];
+  const championArray = [];
+
+  allHeroes.push(...await getHEHeroes('Rare%2B'));
+  allHeroes.push(...await getHEHeroes('Epic'));
+  allHeroes.push(...await getHEHeroes('Epic%2B'));
+  allHeroes.push(...await getHEHeroes('Legendary'));
+  allHeroes.push(...await getHEHeroes('Legendary%2B'));
+  allHeroes.push(...await getHEHeroes('Immortal'));
+  allHeroes.push(...await getHEHeroes('Immortal%2B'));
+  allHeroes.push(...await getHEHeroes('Ultimate'));
+
+  allHeroes.forEach((champ) => {
+    if(champ.sale) {
+      let saleStartTime = new Date(champ.sale.startTime);
+      let currentTime = new Date(new Date() - 600000);
+      if(saleStartTime > currentTime) {
+          championArray.push({
+              champName: champ.name,
+              champPrice: champ.sale.price,
+              champId: champ.id,
+              champAddress: `https://meta.heroesempires.com/en/stats/${champ.tokenId}`,
+              champRarity: '',
+              champBuy: `<https://market.heroesempires.com/market/${champ.id}>`
+          })
+      };
+    }
+  });
+  let discordPosting = [`=====For Sale=====Trademark of Kob`];
+
+  for(let newChampNum = 0;newChampNum < championArray.length;newChampNum++) {
+    let res = await axios.get(championArray[newChampNum].champAddress);
+    let curChamp = res.data;
+    championArray[newChampNum].champRarity = curChamp.Tier;
+    console.log(discordPosting)
+    discordPosting.push(championArray[newChampNum].champRarity.toUpperCase() + ' ' + championArray[newChampNum].champName + ' is on sale for ' + championArray[newChampNum].champPrice + '. Buy at: ' + championArray[newChampNum].champBuy);
+};
+
+  for(let champRange = 0;champRange < championArray.length;champRange+=5) {
+    setTimeout(() => {
+        if(discordPosting) {
+          const data = JSON.stringify({username: 'HE Price Bot', content: discordPosting.slice(champRange, champRange+5).join('\n')});
+          console.log(data);
+          axios.post('https://discord.com/api/webhooks/912556901408067654/n_Cw7aNE9yy4s5UbZfehuAGxqhM5YiSEmV8Gj7bqBlity7RZ3fUKCSIMd-a4vasM6ngV', data, {
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        })
+          .then((res) => {
+              console.log(`Status: ${res.status}`);
+              console.log('Body: ', res.data);
+          }).catch((err) => {
+              console.error(err);
+          });
+    }}, champRange*300);
+}
+
+}
+
+async function getHEHeroes(rarity) {
+  const response = await axios.get(`https://marketplace-api.heroesempires.com/sale-items?class&desc=false&listedOnMarket=true&maxPrice&minPrice&orderBy=price&page=1&race&search=&size=3000&tier=${rarity}`);
+
+  return response.data.data.items;
+}
+
 getChampionData();
+getHEListings();
+
+setInterval(function(){ 
+  getHEListings();
+}, 1000 * 60 * 10);
 
 let riotApiKey = 'RGAPI-5663a1ea-1caa-497a-a98b-eaefa8cb614f';
 let riotTournamentProviderId = '12298';
 let riotTournamentId = '1870940';
-let tournamentCodes = [];
