@@ -983,9 +983,9 @@ async function getChampionData() {
   await getLatestChampionDDragon();
 }
 
-function isHEHeroPriceLow(heroes, heroName, heroPrice) {
+function isHEHeroPriceLow(heroes, heroName, heroPrice, heroRarity) {
   if (heroes && heroes.length && heroName && heroPrice) {
-    const allHeroPrices = heroes.filter(hero => hero.name === heroName && hero.sale)
+    const allHeroPrices = heroes.filter(hero => hero.name === heroName && hero.sale && hero.rarity === heroRarity)
           .map(hero => hero.sale.price)
     const firstFive =  allHeroPrices
           .slice(0, 5)
@@ -996,24 +996,47 @@ function isHEHeroPriceLow(heroes, heroName, heroPrice) {
   }
 }
 
+function getHEHeroRarityColor(rarity) {
+  if (rarity) {
+    switch (rarity.toLowerCase()) {
+      case "rare":
+      case "rare+":
+        return 2520552;
+      case "epic":
+      case "epic+":
+        return 11997656;
+      case "legendary":
+      case "legendary+":
+        return 14646284;
+      case "immortal":
+      case "immortal+":
+        return 15206404;
+      case "ultimate":
+        return 14536974; 
+      default:
+        return 0;
+    }
+  }
+}
+
 async function getHEListings() {
   const allHeroes = [];
-  const championArray = [];
+  let championArray = [];
   let currentTime = new Date(new Date() - 600000);
 
-  allHeroes.push(...await getHEHeroes('Rare%2B'));
+  allHeroes.push(...await getHEHeroes('Rare+'));
   allHeroes.push(...await getHEHeroes('Epic'));
-  allHeroes.push(...await getHEHeroes('Epic%2B'));
+  allHeroes.push(...await getHEHeroes('Epic+'));
   allHeroes.push(...await getHEHeroes('Legendary'));
-  allHeroes.push(...await getHEHeroes('Legendary%2B'));
+  allHeroes.push(...await getHEHeroes('Legendary+'));
   allHeroes.push(...await getHEHeroes('Immortal'));
-  allHeroes.push(...await getHEHeroes('Immortal%2B'));
+  allHeroes.push(...await getHEHeroes('Immortal+'));
   allHeroes.push(...await getHEHeroes('Ultimate'));
-
+ 
   allHeroes.forEach((champ) => {
     if(champ.sale) {
       let saleStartTime = new Date(champ.sale.startTime);
-      if(saleStartTime > currentTime && isHEHeroPriceLow(allHeroes, champ.name, champ.sale.price)) {
+      if(saleStartTime > currentTime) {
           championArray.push({
               champName: champ.name,
               champPrice: champ.sale.price,
@@ -1035,17 +1058,21 @@ async function getHEListings() {
     let res = await axios.get(championArray[newChampNum].champAddress);
     let curChamp = res.data;
     championArray[newChampNum].champRarity = curChamp.Tier;
-    console.log(championArray[newChampNum].isPriceLow)
+    
     discordPosting.push(championArray[newChampNum].champRarity.toUpperCase() + ' ' + championArray[newChampNum].champName + ' is on sale for ' + championArray[newChampNum].champPrice + '. Buy at: ' + championArray[newChampNum].champBuy);
 
     embed.embeds.push({
       "author": {
-        "name": `${championArray[newChampNum].champRarity.toUpperCase()} ${championArray[newChampNum].champName} ${championArray[newChampNum].champPrice}`,
+        "name": `${championArray[newChampNum].champRarity.toUpperCase()} | ${championArray[newChampNum].champName} | ${championArray[newChampNum].champPrice} HE`,
         "url": championArray[newChampNum].champBuy,
         "icon_url": heHeroes[championArray[newChampNum].champName]
       },
+      "color": getHEHeroRarityColor(championArray[newChampNum].champRarity),
+      "description": `[View Details](${championArray[newChampNum].champBuy})`
     })
 };
+
+championArray = championArray.filter(champ => isHEHeroPriceLow(allHeroes, champ.champName, champ.champPrice, champ.champRarity));
 
   for(let champRange = 0;champRange < championArray.length;champRange+=5) {
     setTimeout(() => {
@@ -1158,7 +1185,13 @@ const heHeroes = {
 };
 
 async function getHEHeroes(rarity) {
+  rartiy = rarity.replace(/[+]/, '%2B');
+
   const response = await axios.get(`https://marketplace-api.heroesempires.com/sale-items?class&desc=false&listedOnMarket=true&maxPrice&minPrice&orderBy=price&page=1&race&search=&size=3000&tier=${rarity}`);
+
+  if (response && response.data && response.data.data && response.data.data.items) {
+    response.data.data.items.forEach(item => item.rarity = rarity);
+  }
 
   return response.data.data.items;
 }
