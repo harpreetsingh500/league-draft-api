@@ -1143,18 +1143,18 @@ const heHeroes = {
   "Wukong": "https://support.heroesempires.com/hc/article_attachments/4408343941529/mceclip73.png",
   "Zak": "https://support.heroesempires.com/hc/article_attachments/4408350611993/mceclip75.png",
   "Ballista": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2Fh1mTInBLcpr5sewJFwEZ%2Ffile.png?alt=media",
-  "Caster Minion": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2FGXgkLlIcBvQ4guw7PdjJ%2Ffile.png?alt=media",
+  "CasterMinion": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2FGXgkLlIcBvQ4guw7PdjJ%2Ffile.png?alt=media",
   "Catapult": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2FwwLRVYqYioSvvPJ5veiT%2Ffile.png?alt=media",
-  "Chicken Bomer": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2FXQTw6dDieoexhBMrktTz%2Ffile.png?alt=media",
-  "Earth Dragon": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2FgFqEq7o1u7reRB2ELA6S%2Ffile.png?alt=media",
-  "Fairy Dragon": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2FGXgkLlIcBvQ4guw7PdjJ%2Ffile.png?alt=media",
-  "Friendly Golem": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2FS65I7ATdOsgkfytRsRvD%2Ffile.png?alt=media",
-  "Knight Minion": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2FwcHIFsO88Tbe6LVVSlRr%2Ffile.png?alt=media",
-  "Mutant Rabbit": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2FsaBYh5CCgdLsAlT49eYV%2Ffile.png?alt=media",
-  "Trainee Sniper": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2FLJpMMJlgBnJMvmUll9ll%2Ffile.png?alt=media",
-  "Warrior Minion": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2F3Ovoo0DCYzmMYFqGJTYz%2Ffile.png?alt=media",
+  "ChickenBomer": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2FXQTw6dDieoexhBMrktTz%2Ffile.png?alt=media",
+  "EarthDragon": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2FgFqEq7o1u7reRB2ELA6S%2Ffile.png?alt=media",
+  "FairyDragon": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2FGXgkLlIcBvQ4guw7PdjJ%2Ffile.png?alt=media",
+  "FriendlyGolem": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2FS65I7ATdOsgkfytRsRvD%2Ffile.png?alt=media",
+  "KnightMinion": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2FwcHIFsO88Tbe6LVVSlRr%2Ffile.png?alt=media",
+  "MutantRabbit": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2FsaBYh5CCgdLsAlT49eYV%2Ffile.png?alt=media",
+  "TraineeSniper": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2FLJpMMJlgBnJMvmUll9ll%2Ffile.png?alt=media",
+  "WarriorMinion": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2F3Ovoo0DCYzmMYFqGJTYz%2Ffile.png?alt=media",
   "Wolf": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2FrObomoUYmGOLIEV1xkhL%2Ffile.png?alt=media",
-  "Wyvern Dragon": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2FaQB2wbQeb1pcW6N31N9w%2Ffile.png?alt=media"
+  "WyvernDragon": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2FaQB2wbQeb1pcW6N31N9w%2Ffile.png?alt=media"
 };
 
 async function getHEHeroes(rarity) {
