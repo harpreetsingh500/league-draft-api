@@ -42,6 +42,7 @@ function getHEHeroRarityColor(rarity) {
 }
 
 async function getHEListings() {
+  const hePriceUSD = await getHEPriceInUSD();
   const allHeroes = [];
   let championArray = [];
   let currentTime = new Date(new Date() - 600000);
@@ -79,51 +80,53 @@ async function getHEListings() {
   for(let newChampNum = 0;newChampNum < championArray.length;newChampNum++) {
     let res = await axios.get(championArray[newChampNum].champAddress);
     let curChamp = res.data;
+    let hePrice = championArray[newChampNum].champPrice;
+    let heroPriceUSD = (hePrice * hePriceUSD).toFixed(2);
+
     championArray[newChampNum].champRarity = curChamp.Tier;
 
     embed.embeds.push({
       "author": {
-        "name": `${championArray[newChampNum].champRarity.toUpperCase()} | ${championArray[newChampNum].champName} | ${championArray[newChampNum].champPrice} HE`,
+        "name": `${championArray[newChampNum].champRarity.toUpperCase()} | ${championArray[newChampNum].champName} | ${hePrice} HE ($${heroPriceUSD})`,
         "url": championArray[newChampNum].champBuy,
         "icon_url": heHeroes[championArray[newChampNum].champName]
       },
       "color": getHEHeroRarityColor(championArray[newChampNum].champRarity),
       "description": `[View Details](${championArray[newChampNum].champBuy})`
     })
-};
+  };
 
-championArray = championArray.filter(champ => isHEHeroPriceLow(allHeroes, champ.champName, champ.champPrice, champ.champRarity));
+  championArray = championArray.filter(champ => isHEHeroPriceLow(allHeroes, champ.champName, champ.champPrice, champ.champRarity));
 
   for(let champRange = 0;champRange < championArray.length;champRange+=5) {
-    setTimeout(() => {
-        const data = JSON.stringify({username: 'HE Price Bot', embeds: embed.embeds.slice(champRange, champRange+5)});
+  setTimeout(() => {
+      const data = JSON.stringify({username: 'HE Price Bot', embeds: embed.embeds.slice(champRange, champRange+5)});
 
-        axios.post('https://discord.com/api/webhooks/912556901408067654/n_Cw7aNE9yy4s5UbZfehuAGxqhM5YiSEmV8Gj7bqBlity7RZ3fUKCSIMd-a4vasM6ngV', data, {
-          headers: {
-              'Content-Type': 'application/json',
-          }
-      })
-        .then((res) => {
-            // console.log(`Status: ${res.status}`);
-            // console.log('Body: ', res.data);
-        }).catch((err) => {
-            // console.error(err);
-        });
+      axios.post('https://discord.com/api/webhooks/912556901408067654/n_Cw7aNE9yy4s5UbZfehuAGxqhM5YiSEmV8Gj7bqBlity7RZ3fUKCSIMd-a4vasM6ngV', data, {
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+      .then((res) => {
+          // console.log(`Status: ${res.status}`);
+          // console.log('Body: ', res.data);
+      }).catch((err) => {
+          // console.error(err);
+      });
 
-        axios.post('https://discord.com/api/webhooks/913611725897625620/XwYWvsQTCnPCDr7J8raNGJtvXl0ke0YFybdDFHjABdX2E4qsUelmrnI4OBK8N51KK9B4', data, {
-          headers: {
-              'Content-Type': 'application/json',
-          }
-      })
-        .then((res) => {
-            // console.log(`Status: ${res.status}`);
-            // console.log('Body: ', res.data);
-        }).catch((err) => {
-            // console.error(err);
-        });
-    }, champRange*500);
-}
-
+      axios.post('https://discord.com/api/webhooks/913611725897625620/XwYWvsQTCnPCDr7J8raNGJtvXl0ke0YFybdDFHjABdX2E4qsUelmrnI4OBK8N51KK9B4', data, {
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+      .then((res) => {
+          // console.log(`Status: ${res.status}`);
+          // console.log('Body: ', res.data);
+      }).catch((err) => {
+          // console.error(err);
+      });
+  }, champRange*500);
+  }
 }
 
 const intervalMinutes = 10;
@@ -202,6 +205,14 @@ const heHeroes = {
   "Wolf": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2FrObomoUYmGOLIEV1xkhL%2Ffile.png?alt=media",
   "WyvernDragon": "https://firebasestorage.googleapis.com/v0/b/gitbook-x-prod.appspot.com/o/spaces%2F-MhRIVN9mkaErwYTfzUX%2Fuploads%2FaQB2wbQeb1pcW6N31N9w%2Ffile.png?alt=media"
 };
+
+async function getHEPriceInUSD() {
+  const response = await axios.get('https://api.coingecko.com/api/v3/coins/heroes-empires');
+
+  if (response) {
+    return response.data['market_data']['current_price']['usd'];
+  }
+}
 
 async function getHEHeroes(rarity) {
   const encodedRartiy = rarity.replace(/[+]/, '%2B');
