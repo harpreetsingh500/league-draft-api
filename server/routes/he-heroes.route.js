@@ -55,7 +55,7 @@ async function getHEListings() {
   allHeroes.push(...await getHEHeroes('Immortal'));
   allHeroes.push(...await getHEHeroes('Immortal+'));
   allHeroes.push(...await getHEHeroes('Ultimate'));
-
+console.log(allHeroes)
   allHeroes.forEach((champ) => {
     if(champ.sale) {
       let saleStartTime = new Date(champ.sale.startTime);
@@ -216,9 +216,9 @@ async function getHEPriceInUSD() {
 
 async function getHEHeroes(rarity) {
   const encodedRartiy = rarity.replace(/[+]/, '%2B');
-
-  const response = await axios.get(`https://marketplace-api.heroesempires.com/sale-items?class&desc=false&listedOnMarket=true&maxPrice&minPrice&orderBy=price&page=1&race&search=&size=3000&tier=${encodedRartiy}`);
-
+console.log(encodedRartiy)
+  const response = await axios.get(`https://mpapi.heroesempires.com/market/api/sale-items?class=&desc=asc&listedOnMarket=true&minPrice=0&orderBy=price&page=1&race=&search=&size=21&tier=Rare%2B`);
+console.log(response)
   if (response && response.data && response.data.data && response.data.data.items) {
     response.data.data.items.forEach(item => item.rarity = rarity);
   }
@@ -226,8 +226,8 @@ async function getHEHeroes(rarity) {
   return response.data.data.items;
 }
 
-getHEListings();
+// getHEListings();
 
-setInterval(function(){ 
-  getHEListings();
-}, 1000 * 60 * intervalMinutes);
+// setInterval(function(){ 
+//   getHEListings();
+// }, 1000 * 60 * intervalMinutes);
