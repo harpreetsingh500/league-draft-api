@@ -213,7 +213,7 @@ async function getHEPriceInUSD() {
     return response.data['market_data']['current_price']['usd'];
   }
 }
-
+ 
 async function getHEHeroes(rarity) {
   const encodedRartiy = rarity.replace(/[+]/, '%2B');
 console.log(encodedRartiy)
